@@ -33,6 +33,29 @@ def skip(rel: str) -> bool:
     return "/." in "/" + rel and not rel.endswith(".htaccess")
 
 
+def add_text(z: zipfile.ZipFile, rel: str, text: str) -> None:
+    # writestr() alone stores no permissions, so Linux hosts extract the file as unreadable (0000).
+    info = zipfile.ZipInfo(rel, date_time=datetime.datetime.now().timetuple()[:6])
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = (0o100644 & 0xFFFF) << 16
+    z.writestr(info, text)
+
+
+def add_dir(z: zipfile.ZipFile, rel: str) -> None:
+    info = zipfile.ZipInfo(rel.rstrip("/") + "/", date_time=datetime.datetime.now().timetuple()[:6])
+    info.external_attr = ((0o040755 & 0xFFFF) << 16) | 0x10
+    z.writestr(info, "")
+
+
+def add_file(z: zipfile.ZipFile, path: pathlib.Path, rel: str) -> None:
+    # Files from Windows carry no Unix mode either; set the usual 0644.
+    info = zipfile.ZipInfo.from_file(path, rel)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = (0o100644 & 0xFFFF) << 16
+    with open(path, "rb") as fh:
+        z.writestr(info, fh.read())
+
+
 def sub_once(pattern: str, repl: str, text: str, what: str) -> str:
     text, n = re.subn(pattern, repl, text)
     if n != 1:
@@ -58,8 +81,13 @@ def main() -> None:
 
     count = 0
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for d in ("data/", "uploads/", "uploads/gallery/", "uploads/site/"):
-            z.writestr(zipfile.ZipInfo(d), "")  # keep the empty folders
+        dirs = {"data", "uploads", "uploads/gallery", "uploads/site"}
+        for path in SITE.rglob("*"):
+            rel = path.relative_to(SITE).as_posix()
+            if path.is_dir() and not skip(rel + "/x") and not rel.startswith(("data/", "uploads/")):
+                dirs.add(rel)
+        for d in sorted(dirs):
+            add_dir(z, d)  # explicit 0755 folders, including the empty data/ and uploads/ ones
         for path in sorted(SITE.rglob("*")):
             if path.is_dir():
                 continue
@@ -72,11 +100,11 @@ def main() -> None:
                 if demo_url:
                     text = sub_once(r"\?: 'https://mirapools\.in'\)", f"?: '{demo_url}')", text, "SITE_URL")
                     text = sub_once(r"define\('SITE_NOINDEX', false\);", "define('SITE_NOINDEX', true);", text, "SITE_NOINDEX")
-                z.writestr(rel, text)
+                add_text(z, rel, text)
             elif rel == "robots.txt" and demo_url:
-                z.writestr(rel, DEMO_ROBOTS)
+                add_text(z, rel, DEMO_ROBOTS)
             else:
-                z.write(path, rel)
+                add_file(z, path, rel)
             count += 1
 
     keyfile.write_text(
