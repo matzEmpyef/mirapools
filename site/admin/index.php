@@ -5,6 +5,7 @@
 
 declare(strict_types=1);
 
+require dirname(__DIR__) . '/includes/php-check.php';
 require __DIR__ . '/inc.php';
 
 header('X-Robots-Tag: noindex, nofollow');
