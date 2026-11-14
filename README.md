@@ -30,6 +30,8 @@ No database is needed.
 7. Send a test enquiry from /contact and check that it reaches the admin panel and info@mirapools.in. If the e-mail doesn't arrive, the host may block PHP `mail()`. Enquiries still show in the admin panel.
 8. Add the site to Google Search Console, submit `https://mirapools.in/sitemap.xml`, and create a Google Business Profile for the head office.
 
+**Client preview (mirapools.empyef.com):** run `python tools/package.py --demo https://mirapools.empyef.com`. This builds `dist/mirapools-demo-<date>.zip` with its own key in `dist/SETUP_KEY-demo.txt`. The preview is marked "noindex" and its robots.txt blocks search engines, so it won't compete with mirapools.in on Google. Upload it to the subdomain's document root the same way as above. When the real site goes live, delete the preview or redirect it to mirapools.in.
+
 **Updating later:** run `python tools/package.py` again and upload the files that changed. Never overwrite `data/` or `uploads/` on the server: they hold the live gallery, password and enquiries. Take a backup of those two folders now and then.
 
 ## Admin panel (`/admin/`)
