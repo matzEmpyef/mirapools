@@ -9,6 +9,9 @@ declare(strict_types=1);
 // Public address of the site, no trailing slash. Used for canonical URLs, sitemap and social cards.
 define('SITE_URL', getenv('MIRA_SITE_URL') ?: 'https://mirapools.in');
 
+// true on demo/preview copies so search engines skip them (set by tools/package.py --demo).
+define('SITE_NOINDEX', false);
+
 // One-time key needed to create the first admin password at /admin.
 // Left empty in the code on purpose: tools/package.py fills in a fresh random key
 // (saved to dist/SETUP_KEY.txt). Setup is refused while this is empty.

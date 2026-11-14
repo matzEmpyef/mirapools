@@ -141,6 +141,8 @@ function admin_head(string $title, string $page = ''): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title><?= e($title) ?> – Mira Pools admin</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">

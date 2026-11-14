@@ -23,7 +23,7 @@ $isActive = fn(string $href) => $href === '/' ? $current === '/' : str_starts_wi
 <title><?= e($fullTitle) ?></title>
 <meta name="description" content="<?= e($page['description']) ?>">
 <link rel="canonical" href="<?= e($canonical) ?>">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="<?= SITE_NOINDEX ? 'noindex, nofollow' : 'index, follow, max-image-preview:large' ?>">
 <meta name="theme-color" content="#073b40">
 <meta name="geo.region" content="IN-KL">
 <meta name="geo.placename" content="Kochi, Kerala">
@@ -40,7 +40,10 @@ $isActive = fn(string $href) => $href === '/' ? $current === '/' : str_starts_wi
 <meta name="twitter:description" content="<?= e($page['description']) ?>">
 <meta name="twitter:image" content="<?= e($ogImage) ?>">
 
-<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
