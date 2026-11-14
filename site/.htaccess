@@ -25,10 +25,13 @@ ErrorDocument 404 /404.php
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
   RewriteRule ^services/([a-z0-9-]+)/?$ service.php?slug=$1 [L,QSA]
 
-  # /about -> about.php when that file exists
+  # /about/ -> /about, then /about -> about.php when that file exists.
+  # Uses REQUEST_FILENAME, not DOCUMENT_ROOT, which can point elsewhere on subdomains.
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{DOCUMENT_ROOT}/$1.php -f
-  RewriteRule ^([a-z0-9-]+)/?$ $1.php [L]
+  RewriteRule ^([a-z0-9-]+)/$ /$1 [R=301,L]
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.php -f
+  RewriteRule ^([a-z0-9-]+)$ $1.php [L]
 </IfModule>
 
 <IfModule mod_headers.c>

@@ -66,7 +66,10 @@ def sub_once(pattern: str, repl: str, text: str, what: str) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--demo", metavar="URL", help="build a preview copy for this address (noindex, robots blocked)")
+    ap.add_argument("--cpanel-php", metavar="PKG", help="cPanel hosts only: put the PHP handler for this package (e.g. ea-php81) at the top of .htaccess")
     args = ap.parse_args()
+    if args.cpanel_php and not re.match(r"^ea-php[0-9]{2}$", args.cpanel_php):
+        raise SystemExit("--cpanel-php needs a cPanel package name like ea-php81 or ea-php83")
     demo_url = args.demo.rstrip("/") if args.demo else ""
     if demo_url and not re.match(r"^https?://[a-z0-9.-]+$", demo_url):
         raise SystemExit("--demo needs a plain address like https://mirapools.empyef.com")
@@ -103,6 +106,17 @@ def main() -> None:
                 add_text(z, rel, text)
             elif rel == "robots.txt" and demo_url:
                 add_text(z, rel, DEMO_ROBOTS)
+            elif rel == ".htaccess" and args.cpanel_php:
+                # Same block cPanel's MultiPHP Manager writes; extracting the zip would otherwise remove it.
+                block = (
+                    "# php -- BEGIN cPanel-generated handler, do not edit\n"
+                    f"# Set the “{args.cpanel_php}” package as the default “PHP” programming language.\n"
+                    "<IfModule mime_module>\n"
+                    f"  AddHandler application/x-httpd-{args.cpanel_php} .php .php8 .phtml\n"
+                    "</IfModule>\n"
+                    "# php -- END cPanel-generated handler, do not edit\n\n"
+                )
+                add_text(z, rel, block + path.read_text(encoding="utf-8"))
             else:
                 add_file(z, path, rel)
             count += 1
