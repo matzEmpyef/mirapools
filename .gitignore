@@ -1,0 +1,21 @@
+# Live / local data written by the site (password hash, gallery edits, enquiries)
+site/data/*
+!site/data/.htaccess
+site/uploads/**/*
+!site/uploads/.htaccess
+!site/uploads/gallery/
+!site/uploads/site/
+
+# Upload packages and the private setup key
+dist/
+
+# Source material and the old website (kept locally, not in the repo)
+*.pdf
+mirapools/
+mirapools.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

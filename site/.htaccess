@@ -1,0 +1,50 @@
+# Mira Pools – Apache rules (works on cPanel / Hostinger shared hosting)
+
+Options -Indexes
+DirectoryIndex index.php
+ErrorDocument 404 /404.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS and drop "www." on the live domain (skipped on localhost)
+  RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1) [NC]
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # Never serve private folders
+  RewriteRule ^(data|includes)(/|$) - [F,L]
+
+  # Clean URLs: /about.php -> /about (public pages only)
+  RewriteCond %{THE_REQUEST} \s/+(about|services|gallery|contact|index)\.php[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L]
+  RewriteRule ^index$ / [R=301,L]
+
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+  RewriteRule ^services/([a-z0-9-]+)/?$ service.php?slug=$1 [L,QSA]
+
+  # /about -> about.php when that file exists
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+  RewriteRule ^([a-z0-9-]+)/?$ $1.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  <FilesMatch "\.(css|js|jpg|jpeg|png|webp|svg|woff2|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/xml text/xml
+</IfModule>
+
+<FilesMatch "\.(json|lock|tmp|md|log)$">
+  Require all denied
+</FilesMatch>
