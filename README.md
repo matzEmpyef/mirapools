@@ -25,7 +25,7 @@ No database is needed.
 2. Point the domain mirapools.in at the hosting (nameservers or an A record, from the domain registrar).
 3. In the hosting's File Manager, open `public_html/`, upload the zip and extract it there. The zip's top level (`index.php`, `.htaccess` and so on) must sit directly in `public_html/`.
 4. Make sure PHP can write to `data/` and `uploads/` (folder permission 755, or 775 if uploads fail).
-5. Turn on SSL for mirapools.in, and set the PHP version to 8.1+ in the hosting panel. The site forces https:// and drops "www." by itself.
+5. Turn on SSL for mirapools.in. Then, **after** extracting the zip, open cPanel → **MultiPHP Manager**, select the domain and apply PHP 8.2 or 8.3, even if it already shows a version. cPanel stores that choice as a "cPanel-generated handler" block inside `.htaccess`, and extracting the zip replaces `.htaccess` and drops it. Without that block the server falls back to an old PHP and every page shows a blank error 500. The site forces https:// and drops "www." by itself.
 6. Open https://mirapools.in/admin/, enter the key from `SETUP_KEY.txt` and choose the admin password. This only happens once; then delete `SETUP_KEY.txt`.
 7. Send a test enquiry from /contact and check that it reaches the admin panel and info@mirapools.in. If the e-mail doesn't arrive, the host may block PHP `mail()`. Enquiries still show in the admin panel.
 8. Add the site to Google Search Console, submit `https://mirapools.in/sitemap.xml`, and create a Google Business Profile for the head office.
