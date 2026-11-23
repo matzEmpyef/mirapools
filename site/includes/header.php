@@ -40,9 +40,9 @@ $isActive = fn(string $href) => $href === '/' ? $current === '/' : str_starts_wi
 <meta name="twitter:description" content="<?= e($page['description']) ?>">
 <meta name="twitter:image" content="<?= e($ogImage) ?>">
 
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico?v=<?= (int) @filemtime(BASE_DIR . '/favicon.ico') ?>" sizes="48x48">
+<link rel="icon" href="<?= asset('img/favicon-32.png') ?>" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="<?= asset('img/apple-touch-icon.png') ?>">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
