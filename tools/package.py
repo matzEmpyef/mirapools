@@ -142,7 +142,8 @@ def build_update(since: str, demo_url: str) -> None:
     rels = [r for r in rels if not skip(r) and (SITE / r).is_file()]
     if not rels:
         raise SystemExit(f"No site files changed since {since}.")
-    stamp = datetime.date.today().strftime("%Y%m%d")
+    # Time in the name too: two updates on one day must not share a file name on the server.
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M")
     out = DIST / f"mirapools-{'demo' if demo_url else 'site'}-update-{stamp}.zip"
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for d in sorted({str(pathlib.PurePosixPath(r).parent) for r in rels} - {"."}):
