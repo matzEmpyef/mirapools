@@ -7,6 +7,8 @@
 Usage:
   python tools/package.py                                        live site (mirapools.in)
   python tools/package.py --demo https://mirapools.empyef.com    preview copy, hidden from search engines
+  python tools/package.py --update-since <commit>                 only files changed since that commit;
+                                                                  keeps the server's .htaccess, config.php, robots.txt
 """
 
 import argparse
@@ -14,6 +16,7 @@ import datetime
 import pathlib
 import re
 import secrets
+import subprocess
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -66,15 +69,16 @@ def sub_once(pattern: str, repl: str, text: str, what: str) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--demo", metavar="URL", help="build a preview copy for this address (noindex, robots blocked)")
-    ap.add_argument("--cpanel-php", metavar="PKG", help="cPanel hosts only: put the PHP handler for this package (e.g. ea-php81) at the top of .htaccess")
+    ap.add_argument("--update-since", metavar="COMMIT", help="update zip: only site files changed since this git commit")
     args = ap.parse_args()
-    if args.cpanel_php and not re.match(r"^ea-php[0-9]{2}$", args.cpanel_php):
-        raise SystemExit("--cpanel-php needs a cPanel package name like ea-php81 or ea-php83")
     demo_url = args.demo.rstrip("/") if args.demo else ""
     if demo_url and not re.match(r"^https?://[a-z0-9.-]+$", demo_url):
         raise SystemExit("--demo needs a plain address like https://mirapools.empyef.com")
 
     DIST.mkdir(exist_ok=True)
+    if args.update_since:
+        build_update(args.update_since, demo_url)
+        return
     key = secrets.token_hex(16)
     stamp = datetime.date.today().strftime("%Y%m%d")
     kind = "demo" if demo_url else "site"
@@ -106,17 +110,6 @@ def main() -> None:
                 add_text(z, rel, text)
             elif rel == "robots.txt" and demo_url:
                 add_text(z, rel, DEMO_ROBOTS)
-            elif rel == ".htaccess" and args.cpanel_php:
-                # Same block cPanel's MultiPHP Manager writes; extracting the zip would otherwise remove it.
-                block = (
-                    "# php -- BEGIN cPanel-generated handler, do not edit\n"
-                    f"# Set the “{args.cpanel_php}” package as the default “PHP” programming language.\n"
-                    "<IfModule mime_module>\n"
-                    f"  AddHandler application/x-httpd-{args.cpanel_php} .php .php8 .phtml\n"
-                    "</IfModule>\n"
-                    "# php -- END cPanel-generated handler, do not edit\n\n"
-                )
-                add_text(z, rel, block + path.read_text(encoding="utf-8"))
             else:
                 add_file(z, path, rel)
             count += 1
@@ -129,6 +122,41 @@ def main() -> None:
     )
     print(f"{out.name}: {count} files, {out.stat().st_size / 1024 / 1024:.1f} MB, for {target}" + (" (hidden from search engines)" if demo_url else ""))
     print(f"Setup key written to {keyfile}")
+
+
+# Files the server keeps as they are on an update: cPanel writes its PHP setting into .htaccess,
+# config.php holds the live setup key, and robots.txt differs between demo and live.
+KEEP_ON_SERVER = {".htaccess", "includes/config.php", "robots.txt"}
+
+
+def git(*args: str) -> list[str]:
+    out = subprocess.run(["git", *args], cwd=ROOT, check=True, capture_output=True, text=True).stdout
+    return [line for line in out.splitlines() if line.strip()]
+
+
+def build_update(since: str, demo_url: str) -> None:
+    changed = git("diff", "--name-only", "--diff-filter=ACMR", since, "--", "site")
+    changed += git("ls-files", "--others", "--exclude-standard", "site")
+    removed = git("diff", "--name-only", "--diff-filter=D", since, "--", "site")
+    rels = sorted({c[len("site/"):] for c in changed} - KEEP_ON_SERVER)
+    rels = [r for r in rels if not skip(r) and (SITE / r).is_file()]
+    if not rels:
+        raise SystemExit(f"No site files changed since {since}.")
+    stamp = datetime.date.today().strftime("%Y%m%d")
+    out = DIST / f"mirapools-{'demo' if demo_url else 'site'}-update-{stamp}.zip"
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+        for d in sorted({str(pathlib.PurePosixPath(r).parent) for r in rels} - {"."}):
+            add_dir(z, d)
+        for r in rels:
+            add_file(z, SITE / r, r)
+    print(f"{out.name}: {len(rels)} changed files since {since}")
+    for r in rels:
+        print("  " + r)
+    gone = [g[len("site/"):] for g in removed if g[len("site/"):] not in KEEP_ON_SERVER]
+    if gone:
+        print("No longer used (can be deleted on the server):")
+        for g in gone:
+            print("  " + g)
 
 
 if __name__ == "__main__":

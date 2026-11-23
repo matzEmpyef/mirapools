@@ -19,7 +19,7 @@ function default_settings(): array
         'brand'        => 'Mira Pools',
         'tagline'      => 'Swimming pools, spas & water solutions across Kerala',
         'phone'        => '+91 99958 55133',
-        'phone_alt'    => '+91 79078 43763',
+        'phone_alt'    => '+91 97783 55133',
         'landline'     => '0484 3103171',
         'whatsapp'     => '919995855133',
         'email'        => 'info@mirapools.in',
@@ -39,7 +39,7 @@ function default_settings(): array
             ['city' => 'Kochi (Head office)', 'district' => 'Kakkanad, Ernakulam', 'phone' => '+91 99958 55133'],
             ['city' => 'Kozhikode',           'district' => 'Calicut',             'phone' => '+91 81298 81762'],
             ['city' => 'Kasaragod',           'district' => 'Kasaragod',           'phone' => '+91 99954 34642'],
-            ['city' => 'Thiruvananthapuram',  'district' => 'Trivandrum',          'phone' => '+91 79078 43763'],
+            ['city' => 'Thiruvananthapuram',  'district' => 'Trivandrum',          'phone' => '+91 97783 55133'],
         ],
     ];
 }

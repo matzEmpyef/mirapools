@@ -145,9 +145,11 @@ address { font-style: normal; }
 .header-inner { display: flex; align-items: center; gap: 28px; }
 
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; flex: none; }
-.logo-mark { width: auto; height: 52px; border-radius: 10px; box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .35); transition: height .45s var(--ease); }
-.is-solid .logo-mark { height: 44px; }
-.brand-footer .logo-mark { height: 64px; }
+.logo-mark { width: auto; height: 50px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .22)); transition: height .45s var(--ease); }
+.is-solid .logo-mark { height: 42px; }
+.brand-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+.brand-footer .logo-mark { height: 62px; filter: none; }
+.brand-tag { font-size: 1.05rem; letter-spacing: .02em; color: #fff; font-weight: 500; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-text span { font-family: var(--f-display); font-size: 1.28rem; font-weight: 500; letter-spacing: -.01em; }
 .brand-text small { font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; opacity: .75; margin-top: 3px; }

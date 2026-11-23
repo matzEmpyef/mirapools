@@ -10,7 +10,7 @@ $s = all_settings();
   </div>
   <div class="wrap footer-grid">
     <div class="footer-about">
-      <a class="brand brand-footer" href="/" aria-label="Mira Pools – home"><?= logo_svg() ?></a>
+      <a class="brand brand-footer" href="/" aria-label="Mira Pools – home"><?= logo_svg() ?><span class="brand-tag">Water Management</span></a>
       <p>Swimming pools, spas, fountains and water treatment, designed, built and looked after across Kerala.</p>
       <a class="footer-wa" href="<?= e(wa_link()) ?>" target="_blank" rel="noopener"><?= icon('chat') ?> Chat on WhatsApp</a>
     </div>

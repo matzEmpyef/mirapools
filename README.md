@@ -32,7 +32,7 @@ No database is needed.
 
 **Client preview (mirapools.empyef.com):** run `python tools/package.py --demo https://mirapools.empyef.com`. This builds `dist/mirapools-demo-<date>.zip` with its own key in `dist/SETUP_KEY-demo.txt`. The preview is marked "noindex" and its robots.txt blocks search engines, so it won't compete with mirapools.in on Google. Upload it to the subdomain's document root the same way as above. When the real site goes live, delete the preview or redirect it to mirapools.in.
 
-**Updating later:** run `python tools/package.py` again and upload the files that changed. Never overwrite `data/` or `uploads/` on the server: they hold the live gallery, password and enquiries. Take a backup of those two folders now and then.
+**Updating later:** build an update zip with only the files that changed since the last upload: `python tools/package.py --update-since <commit of the last upload>` (add `--demo <url>` for the preview). Extract it over the site. It never contains `.htaccess` (cPanel keeps its PHP setting there), `includes/config.php` or `robots.txt`, and the script lists any files that are no longer used. Never overwrite `data/` or `uploads/` on the server: they hold the live gallery, password and enquiries. Take a backup of those two folders now and then.
 
 ## Admin panel (`/admin/`)
 - **Gallery**: upload several photos at once, pick a category, mark photos for the home page, edit titles, drag to reorder, and delete.
@@ -41,7 +41,7 @@ No database is needed.
 - **Settings**: phone numbers, WhatsApp, e-mail, address, branches and social links (updated across the whole site), plus a password change.
 
 ## Temporary content to replace
-- **Logo**: `assets/img/logo.png`, taken from the old website (small, 228×88). Replace it with a higher-resolution file when available; the old artwork misspells the tagline as "Watermangementsystem".
+- **Logo**: `assets/img/logo-mark.png` (the teal "MIRA Pools" badge, used in the header and footer) and `assets/img/logo-full.png` (with "Water Management", used for Google and link previews), both from the client's logo file.
 - **E-mail**: the site uses info@mirapools.in. Make sure that mailbox exists, or change it under Settings.
 - **Photos** in `assets/img/temp/`:
   - `site-project-*`: from the old website

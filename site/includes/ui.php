@@ -5,10 +5,10 @@
 
 declare(strict_types=1);
 
-/** Company logo (from the old website). */
+/** Company logo badge (teal "MIRA Pools"); the full logo with the tagline is assets/img/logo-full.png. */
 function logo_svg(): string
 {
-    return '<img class="logo-mark" src="' . asset('img/logo.png') . '" width="228" height="88" alt="Mira Water Management logo">';
+    return '<img class="logo-mark" src="' . asset('img/logo-mark.png') . '" width="445" height="240" alt="Mira Pools – Water Management">';
 }
 
 /** Responsive <img>. Unsplash URLs get a srcset; local files are used as-is. */
@@ -176,7 +176,7 @@ function site_schema(): array
         'name'        => $s['brand'],
         'legalName'   => $s['company'],
         'url'         => abs_url('/'),
-        'logo'        => abs_url('/assets/img/logo.png'),
+        'logo'        => abs_url('/assets/img/logo-full.png'),
         'image'       => abs_url(img('home_hero')),
         'description' => 'Swimming pool construction, pool and spa filtration, fountains, water treatment and sewage treatment plants, and maintenance contracts across Kerala.',
         'telephone'   => $s['phone'],
