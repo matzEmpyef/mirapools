@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $body = "New enquiry from the website\n\n"
                         . "Name: {$entry['name']}\nPhone: {$entry['phone']}\nE-mail: {$entry['email']}\n"
                         . "Location: {$entry['location']}\nService: {$entry['service']}\n\n{$entry['message']}\n";
-                    $host = parse_url(SITE_URL, PHP_URL_HOST) ?: 'mirapools.in';
-                    $headers = "From: Mira Pools website <no-reply@{$host}>\r\nContent-Type: text/plain; charset=UTF-8";
+                    // Send from the receiving mailbox itself: shared hosts often drop mail from addresses that don't exist.
+                    $headers = 'From: Mira Pools website <' . ENQUIRY_MAIL_TO . ">\r\nContent-Type: text/plain; charset=UTF-8";
                     if ($entry['email'] !== '') {
                         $headers .= "\r\nReply-To: " . str_replace(["\r", "\n"], '', $entry['email']);
                     }
