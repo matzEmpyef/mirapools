@@ -62,6 +62,7 @@ function image_slots(): array
         'about_team'     => ['About – team / site work photo', 'About',    $t . 'project-overflow-edge.jpg',         'Portrait or square'],
         'services_hero'  => ['Services – top photo',           'Services', unsplash('photo-1564751531853-4eace2746ae9', 2000), 'Wide landscape'],
         'gallery_hero'   => ['Gallery – top photo',            'Gallery',  $t . 'site-project-12.jpg',               'Wide landscape'],
+        'projects_hero'  => ['Projects – top photo',           'Projects', unsplash('photo-1694967832949-09984640b143', 2000), 'Wide landscape'],
         'contact_hero'   => ['Contact – top photo',            'Contact',  unsplash('photo-1650519876461-c516be8be76c', 2000), 'Wide landscape'],
         'svc_swimming-pool-construction' => ['Service – Swimming pool construction', 'Services', $t . 'site-project-6.jpg', 'Landscape'],
         'svc_pool-filtration-systems'    => ['Service – Pool & spa filtration',      'Services', $t . 'equip-sand-filter.jpg',      'Landscape'],

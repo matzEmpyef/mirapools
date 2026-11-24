@@ -19,7 +19,8 @@ page_title('Dashboard', 'Welcome back. Here is how the website looks today.');
   <section class="card">
     <h2>Quick links</h2>
     <div class="quick">
-      <a class="btn btn-primary" href="<?= e(admin_url('gallery') . '#upload') ?>">Add gallery photos</a>
+      <a class="btn btn-primary" href="<?= e(admin_url('gallery')) ?>">Add gallery photos</a>
+      <a class="btn" href="<?= e(admin_url('projects')) ?>">Add or edit projects</a>
       <a class="btn" href="<?= e(admin_url('images')) ?>">Change site images</a>
       <a class="btn" href="<?= e(admin_url('enquiries')) ?>">Read enquiries</a>
       <a class="btn" href="<?= e(admin_url('settings')) ?>">Contact details</a>
@@ -33,6 +34,7 @@ page_title('Dashboard', 'Welcome back. Here is how the website looks today.');
       <li><b>Put photos on the home page:</b> tick "Show on home page" when uploading, or edit a photo later.</li>
       <li><b>Change the order:</b> drag photos on a computer, or use the arrow buttons on a phone.</li>
       <li><b>Change a page photo:</b> go to Site images and upload a new one. "Reset" brings the original back.</li>
+      <li><b>Projects:</b> under Projects, press "Add project", enter the name and location, and mark it Ongoing or Completed (with the month and year).</li>
       <li><b>Phone, email, address:</b> edit them under Settings and they update across the whole site.</li>
     </ul>
   </section>

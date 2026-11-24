@@ -112,6 +112,7 @@ function admin_nav(): array
 {
     return [
         'dashboard' => ['Dashboard', 'M3 12l9-8 9 8M5 10v10h5v-6h4v6h5V10'],
+        'projects'  => ['Projects', 'M9 4h6v3H9zM6 6h12v15H6zM9 11h6M9 15h4'],
         'gallery'   => ['Gallery', 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M9 9.5h.01'],
         'images'    => ['Site images', 'M3 4h18v12H3zM8 20h8M12 16v4'],
         'enquiries' => ['Enquiries', 'M4 6h16v12H4zM4 7l8 6 8-6'],

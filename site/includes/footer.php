@@ -43,7 +43,9 @@ $s = all_settings();
       <ul class="footer-links footer-contact">
         <li><a href="<?= e(tel_link($s['phone'])) ?>"><?= icon('phone') ?><?= e($s['phone']) ?></a></li>
         <?php if ($s['landline']): ?><li><a href="<?= e(tel_link($s['landline'])) ?>"><?= icon('phone') ?><?= e($s['landline']) ?></a></li><?php endif; ?>
-        <li><a href="mailto:<?= e($s['email']) ?>"><?= icon('mail') ?><?= e($s['email']) ?></a></li>
+        <?php foreach (array_filter([$s['email'], $s['email_alt']]) as $mail): ?>
+          <li><a href="mailto:<?= e($mail) ?>"><?= icon('mail') ?><?= e($mail) ?></a></li>
+        <?php endforeach; ?>
       </ul>
     </div>
   </div>

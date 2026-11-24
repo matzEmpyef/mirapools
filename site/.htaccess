@@ -18,7 +18,7 @@ ErrorDocument 404 /404.php
   RewriteRule ^(data|includes)(/|$) - [F,L]
 
   # Clean URLs: /about.php -> /about (public pages only)
-  RewriteCond %{THE_REQUEST} \s/+(about|services|gallery|contact|index)\.php[\s?] [NC]
+  RewriteCond %{THE_REQUEST} \s/+(about|services|projects|gallery|contact|index)\.php[\s?] [NC]
   RewriteRule ^ /%1 [R=301,L]
   RewriteRule ^index$ / [R=301,L]
 

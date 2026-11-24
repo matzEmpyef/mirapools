@@ -14,7 +14,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 start_session();
 
-$allowed = ['dashboard', 'gallery', 'images', 'enquiries', 'settings', 'login', 'setup', 'logout'];
+$allowed = ['dashboard', 'projects', 'gallery', 'images', 'enquiries', 'settings', 'login', 'setup', 'logout'];
 $page = (string) ($_GET['p'] ?? 'dashboard');
 if (!in_array($page, $allowed, true)) {
     $page = 'dashboard';

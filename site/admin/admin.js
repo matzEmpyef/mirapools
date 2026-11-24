@@ -202,3 +202,35 @@
     sync();
   }
 })();
+
+/* Projects: add / edit popup */
+(function () {
+  'use strict';
+  var form = document.querySelector('[data-project-form]');
+  if (!form) { return; }
+  var modal = document.getElementById('project-modal');
+  var title = document.getElementById('project-modal-title');
+  var dates = form.querySelector('[data-completed-fields]');
+  function syncStatus() { dates.hidden = !form.querySelector('input[name=status][value=completed]').checked; }
+  form.querySelectorAll('input[name=status]').forEach(function (r) { r.addEventListener('change', syncStatus); });
+  function open(data) {
+    form.reset();
+    form.elements.id.value = data ? data.id : '';
+    form.elements.name.value = data ? data.name : '';
+    form.elements.location.value = data ? data.location : '';
+    form.querySelector('input[name=status][value=' + (data && data.status === 'completed' ? 'completed' : 'ongoing') + ']').checked = true;
+    if (data && data.status === 'completed') {
+      form.elements.year.value = data.year;
+      form.elements.month.value = data.month;
+    }
+    title.textContent = data ? 'Edit project' : 'Add project';
+    syncStatus();
+    modal.showModal ? modal.showModal() : modal.setAttribute('open', '');
+    setTimeout(function () { form.elements.name.focus(); }, 30);
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-project-add]')) { open(null); return; }
+    var b = e.target.closest('[data-project-edit]');
+    if (b) { open(b.closest('tr').dataset); }
+  });
+})();

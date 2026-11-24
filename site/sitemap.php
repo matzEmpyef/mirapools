@@ -11,6 +11,7 @@ $urls = [
     ['/about', filemtime(__DIR__ . '/about.php'), '0.8'],
     ['/services', filemtime(__DIR__ . '/services.php'), '0.9'],
     ['/gallery', $galleryMod, '0.8'],
+    ['/projects', is_file(data_path('projects')) ? filemtime(data_path('projects')) : filemtime(__DIR__ . '/projects.php'), '0.7'],
     ['/contact', filemtime(__DIR__ . '/contact.php'), '0.7'],
 ];
 $contentMod = filemtime(__DIR__ . '/includes/content.php');

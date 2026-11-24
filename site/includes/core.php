@@ -370,3 +370,46 @@ function enquiries_save(array $list): bool
 {
     return json_write('enquiries', array_values($list));
 }
+
+/* ---------- projects ---------- */
+
+/**
+ * Projects added from /admin. Record: {id, name, location, status (ongoing|completed),
+ * year (int, completed only), month (0 = not given, 1-12), created}.
+ */
+function projects_all(): array
+{
+    return array_values(array_filter(json_read('projects', []), 'is_array'));
+}
+
+function projects_save(array $list): bool
+{
+    return json_write('projects', array_values($list));
+}
+
+/** Ongoing in the order they were added (newest first); completed newest first by date. */
+function projects_split(): array
+{
+    $ongoing = $done = [];
+    foreach (projects_all() as $p) {
+        if (($p['status'] ?? '') === 'completed') {
+            $done[] = $p;
+        } else {
+            $ongoing[] = $p;
+        }
+    }
+    usort($done, fn($a, $b) => [(int) ($b['year'] ?? 0), (int) ($b['month'] ?? 0)] <=> [(int) ($a['year'] ?? 0), (int) ($a['month'] ?? 0)]
+        ?: strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? '')));
+    return [$ongoing, $done];
+}
+
+/** "March 2024", or just "2024" when no month was given. */
+function project_date(array $p): string
+{
+    $y = (int) ($p['year'] ?? 0);
+    $m = (int) ($p['month'] ?? 0);
+    if (!$y) {
+        return '';
+    }
+    return $m >= 1 && $m <= 12 ? date('F', mktime(0, 0, 0, $m, 1)) . ' ' . $y : (string) $y;
+}

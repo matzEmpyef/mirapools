@@ -252,6 +252,7 @@ function nav_pages(): array
         '/'         => 'Home',
         '/about'    => 'About',
         '/services' => 'Services',
+        '/projects' => 'Projects',
         '/gallery'  => 'Gallery',
         '/contact'  => 'Contact',
     ];

@@ -100,9 +100,14 @@ $field = function (string $name) use ($errors): string {
         <a class="c-card c-card-wa" href="<?= e(wa_link('Hello Mira Pools, ')) ?>" target="_blank" rel="noopener" data-reveal>
           <span class="c-ic"><?= icon('chat') ?></span><span><small>WhatsApp</small><strong>Chat with us</strong></span>
         </a>
-        <a class="c-card" href="mailto:<?= e($s['email']) ?>" data-reveal>
-          <span class="c-ic"><?= icon('mail') ?></span><span><small>E-mail</small><strong><?= e($s['email']) ?></strong></span>
-        </a>
+        <div class="c-card" data-reveal>
+          <span class="c-ic"><?= icon('mail') ?></span>
+          <span><small>E-mail</small>
+            <?php foreach (array_filter([$s['email'], $s['email_alt']]) as $mail): ?>
+              <a class="c-mail" href="mailto:<?= e($mail) ?>"><?= e($mail) ?></a>
+            <?php endforeach; ?>
+          </span>
+        </div>
         <div class="c-card" data-reveal>
           <span class="c-ic"><?= icon('pin') ?></span><span><small>Head office</small><strong><?= e($s['address_line']) ?>, <?= e($s['locality']) ?>, <?= e($s['city']) ?> <?= e($s['postcode']) ?></strong></span>
         </div>
