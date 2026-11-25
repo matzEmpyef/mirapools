@@ -5,10 +5,17 @@
 
 declare(strict_types=1);
 
-/** Company logo badge (teal "MIRA Pools"); the full logo with the tagline is assets/img/logo-full.png. */
-function logo_svg(): string
+/**
+ * Full company logo. "light" has a white tagline for dark backgrounds, "dark" a dark one;
+ * "both" prints the two and CSS shows the right one (the header changes colour on scroll).
+ */
+function logo_svg(string $variant = 'both'): string
 {
-    return '<img class="logo-mark" src="' . asset('img/logo-mark.png') . '" width="445" height="240" alt="Mira Pools – Water Management">';
+    $img = fn(string $v, string $alt) => '<img class="logo-mark logo-' . $v . '" src="' . asset('img/logo-full-' . $v . '.png') . '" width="435" height="300" alt="' . $alt . '">';
+    if ($variant !== 'both') {
+        return $img($variant, 'Mira Pools – Water Management');
+    }
+    return $img('light', 'Mira Pools – Water Management') . $img('dark', '');
 }
 
 /** Responsive <img>. Unsplash URLs get a srcset; local files are used as-is. */
