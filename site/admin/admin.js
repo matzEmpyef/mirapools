@@ -212,6 +212,15 @@
   var title = document.getElementById('project-modal-title');
   var dates = form.querySelector('[data-completed-fields]');
   function syncStatus() { dates.hidden = !form.querySelector('input[name=status][value=completed]').checked; }
+  var prev = form.querySelector('[data-photo-prev]');
+  var blank = prev.innerHTML;
+  var removeBox = form.querySelector('[data-photo-remove]');
+  var photoIn = form.querySelector('[data-photo-input]');
+  function setPreview(src) { prev.innerHTML = src ? '<img alt="" src="' + src.replace(/"/g, '&quot;') + '">' : blank; }
+  photoIn.addEventListener('change', function () {
+    var f = photoIn.files[0];
+    if (f) { setPreview(URL.createObjectURL(f)); removeBox.querySelector('input').checked = false; }
+  });
   form.querySelectorAll('input[name=status]').forEach(function (r) { r.addEventListener('change', syncStatus); });
   function open(data) {
     form.reset();
@@ -224,6 +233,8 @@
       form.elements.month.value = data.month;
     }
     title.textContent = data ? 'Edit project' : 'Add project';
+    setPreview(data && data.thumb ? data.thumb : '');
+    removeBox.hidden = !(data && data.thumb);
     syncStatus();
     modal.showModal ? modal.showModal() : modal.setAttribute('open', '');
     setTimeout(function () { form.elements.name.focus(); }, 30);

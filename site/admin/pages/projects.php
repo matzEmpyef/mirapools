@@ -38,27 +38,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'month'    => $status === 'completed' && $month >= 1 && $month <= 12 ? $month : 0,
         ];
         $id = (string) ($_POST['id'] ?? '');
-        if ($id !== '') {
-            $i = $find($id);
-            if ($i < 0) {
-                flash('error', 'That project no longer exists.');
+        $i = $id !== '' ? $find($id) : -1;
+        if ($id !== '' && $i < 0) {
+            flash('error', 'That project no longer exists.');
+            redirect_to('projects');
+        }
+
+        // Optional photo: a new upload replaces the old one; "remove" clears it.
+        $old = $i >= 0 ? $list[$i] : [];
+        $record['image'] = (string) ($old['image'] ?? '');
+        $record['thumb'] = (string) ($old['thumb'] ?? '');
+        $file = $_FILES['photo'] ?? null;
+        $newPhoto = is_array($file) && ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+        if ($newPhoto) {
+            try {
+                [$src, $thumb] = store_uploaded_image($file, 'projects');
+            } catch (Throwable $ex) {
+                flash('error', 'Photo not saved: ' . ($ex instanceof RuntimeException ? $ex->getMessage() : 'it could not be processed.'));
                 redirect_to('projects');
             }
+            [$record['image'], $record['thumb']] = [$src, $thumb];
+        } elseif (!empty($_POST['remove_photo'])) {
+            [$record['image'], $record['thumb']] = ['', ''];
+        }
+        $dropOld = ($newPhoto || !empty($_POST['remove_photo'])) && !empty($old['image']);
+
+        if ($i >= 0) {
             $list[$i] = $record + $list[$i];
             $msg = 'Project saved.';
         } else {
             array_unshift($list, ['id' => 'p' . bin2hex(random_bytes(5))] + $record + ['created' => now_iso()]);
             $msg = 'Project added.';
         }
-        projects_save($list) ? flash('ok', $msg) : flash('error', 'Could not save. Check that the data folder is writable.');
+        if (projects_save($list)) {
+            if ($dropOld) {
+                delete_upload($old['image']);
+                delete_upload($old['thumb'] ?? null);
+            }
+            flash('ok', $msg);
+        } else {
+            flash('error', 'Could not save. Check that the data folder is writable.');
+        }
         redirect_to('projects');
     }
 
     if ($action === 'delete') {
         $i = $find((string) ($_POST['id'] ?? ''));
         if ($i >= 0) {
+            $gone = $list[$i];
             array_splice($list, $i, 1);
-            projects_save($list) ? flash('ok', 'Project deleted.') : flash('error', 'Could not delete. Check that the data folder is writable.');
+            if (projects_save($list)) {
+                delete_upload($gone['image'] ?? null);
+                delete_upload($gone['thumb'] ?? null);
+                flash('ok', 'Project deleted.');
+            } else {
+                flash('error', 'Could not delete. Check that the data folder is writable.');
+            }
         }
         redirect_to('projects');
     }
@@ -76,8 +111,12 @@ page_title('Projects', 'Ongoing and completed projects shown on the Projects pag
 $row = function (array $p) use ($self): void {
     $id = (string) ($p['id'] ?? ''); ?>
     <tr data-id="<?= e($id) ?>" data-name="<?= e((string) $p['name']) ?>" data-location="<?= e((string) ($p['location'] ?? '')) ?>"
-        data-status="<?= e((string) ($p['status'] ?? 'ongoing')) ?>" data-year="<?= (int) ($p['year'] ?? 0) ?>" data-month="<?= (int) ($p['month'] ?? 0) ?>">
-      <td><strong><?= e((string) $p['name']) ?></strong></td>
+        data-status="<?= e((string) ($p['status'] ?? 'ongoing')) ?>" data-year="<?= (int) ($p['year'] ?? 0) ?>" data-month="<?= (int) ($p['month'] ?? 0) ?>"
+        data-thumb="<?= e((string) ($p['thumb'] ?? $p['image'] ?? '')) ?>">
+      <td class="t-proj">
+        <span class="t-thumb"><?php if (!empty($p['thumb']) || !empty($p['image'])): ?><img src="<?= e((string) ($p['thumb'] ?: $p['image'])) ?>" alt="" loading="lazy"><?php else: ?><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4"/></svg><?php endif; ?></span>
+        <strong><?= e((string) $p['name']) ?></strong>
+      </td>
       <td class="muted"><?= e((string) ($p['location'] ?? '')) ?: '–' ?></td>
       <td><?= ($p['status'] ?? '') === 'completed' ? e(project_date($p)) : '<span class="badge badge-teal">In progress</span>' ?></td>
       <td class="t-actions">
@@ -123,10 +162,21 @@ $row = function (array $p) use ($self): void {
 </section>
 
 <?php modal_open('project-modal', 'Add project', '', 'sm'); ?>
-  <form method="post" action="<?= e($self) ?>" data-project-form>
+  <form method="post" action="<?= e($self) ?>" enctype="multipart/form-data" data-project-form>
     <?= csrf_field() ?><input type="hidden" name="action" value="save"><input type="hidden" name="id" value="">
     <label class="field"><span>Project name</span><input type="text" name="name" maxlength="160" required placeholder="e.g. Villa pool for Mr. Varghese"></label>
     <label class="field"><span>Location <i>(optional)</i></span><input type="text" name="location" maxlength="120" placeholder="e.g. Kakkanad, Kochi"></label>
+    <div class="field">
+      <span>Photo <i>(optional)</i></span>
+      <div class="photo-pick">
+        <span class="photo-prev" data-photo-prev><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4"/></svg></span>
+        <div class="photo-ctl">
+          <label class="btn btn-sm"><input type="file" name="photo" accept="image/jpeg,image/png,image/webp" hidden data-photo-input> Choose photo</label>
+          <label class="check small" data-photo-remove hidden><input type="checkbox" name="remove_photo" value="1"> <span>Remove photo</span></label>
+          <small class="muted">JPG, PNG or WebP. Shown on the project's card.</small>
+        </div>
+      </div>
+    </div>
     <fieldset class="seg" aria-label="Status">
       <label><input type="radio" name="status" value="ongoing" checked> <span>Ongoing</span></label>
       <label><input type="radio" name="status" value="completed"> <span>Completed</span></label>
